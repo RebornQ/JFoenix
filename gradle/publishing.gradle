@@ -6,7 +6,7 @@ ext {
     buildTime = new SimpleDateFormat('HH:mm:ss.SSSZ').format(buildTimeAndDate)
 }
 
-apply plugin: 'signing'
+// apply plugin: 'signing'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'net.nemerosa.versioning'
@@ -75,20 +75,20 @@ def pomConfig = {
     }
 }
 
-// sign all artifacts
+/*// sign all artifacts
 task signJars (type : Sign, dependsOn: [jar, javadocJar, sourcesJar]) {
     sign configurations.archives
 }
 // sign pom
 task signPom(type: Sign) {
     sign configurations.pom
-}
+}*/
 // defining which tasks should be called
-if (project.ext.pomFile.exists()) {
+/*if (project.ext.pomFile.exists()) {
     task preparePublication (dependsOn : [signJars, signPom])
 } else {
     task preparePublication (dependsOn : signJars)
-}
+}*/
 // extract signatures and add classifier and extension to them
 def getSignatureFiles = {
     def allFiles = project.tasks.signJars.signatureFiles.collect { it }
@@ -106,13 +106,13 @@ def getPomSignature = {
     return project.tasks.signPom.signatureFiles.collect{it}[0]
 }
 
-signing {
+/*signing {
     sign configurations.archives
-}
+}*/
 
 publishing {
     publications {
-	    gpgJars(MavenPublication) {
+	    /*gpgJars(MavenPublication) {
             getSignatureFiles().each {signature ->
                 artifact (signature.archive) {
                     classifier = signature.classifier
@@ -127,7 +127,7 @@ publishing {
                     extension  = 'pom.asc'
                 }
             }
-        }
+        }*/
 
         mavenJava(MavenPublication) {
             from components.java
@@ -135,14 +135,14 @@ publishing {
             artifact javadocJar
             pom.withXml {
                 asNode().children().last() + pomConfig
-                 if (!project.ext.pomFile.exists()) {
+                 /*if (!project.ext.pomFile.exists()) {
                     writeTo (project.ext.pomFile)
-                }
+                }*/
             }
         }
     }
     repositories {
-    	maven {
+    	/*maven {
 		    if (project.ext.pomFile.exists()) {
 		        credentials {
 		            username project.username
@@ -156,7 +156,8 @@ publishing {
 		    } else {
 		        url project.local_deploy
 		    }
-	    }
+	    }*/
+        mavenLocal()
     }
 }
 
